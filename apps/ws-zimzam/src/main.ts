@@ -14,13 +14,13 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
-        port: 4200,
+        port: 4201,
       },
     }
   );
 
   await app.listen();
-  Logger.log(`🚀 Application is running on: http://localhost:4200`);
+  Logger.log(`🚀 Application is running on: http://localhost:4201`);
 }
 
 bootstrap();

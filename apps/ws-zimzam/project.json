@@ -1,0 +1,24 @@
+{
+  "name": "ws-zimzam",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/ws-zimzam/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "ws-zimzam:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "ws-zimzam:build:development"
+        },
+        "production": {
+          "buildTarget": "ws-zimzam:build:production"
+        }
+      }
+    }
+  }
+}
