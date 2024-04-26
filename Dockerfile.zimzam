@@ -1,8 +1,0 @@
-FROM node:latest 
-
-WORKDIR /app
-
-COPY ./dist/apps/zimzam /zimzam
-COPY ./dist/apps/zimzam-app /zimzam-app
-
-RUN node ./zimzam/main.js
