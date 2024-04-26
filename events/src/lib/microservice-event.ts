@@ -1,3 +1,5 @@
 export enum MicroServiceEvent {
-  CMC_PRICE_UPDATE = 'cmc_price_update',
+  FETCH_PRICE_REQUEST = 'fetch_price_request',
+  RECORD_LATEST_PRICE = 'add_latest_price',
+  BROADCAST_LATEST_PRICE = 'cmc_price_update',
 }

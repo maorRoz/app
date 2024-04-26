@@ -1,27 +1,16 @@
+import dotenv from 'dotenv';
 import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectModel } from '@nestjs/mongoose';
 import { Asset } from './schemas/asset.schema';
-import axios from 'axios';
 import { ClientProxy } from '@nestjs/microservices';
 import { MicroServiceEvent } from '@app/events';
+import { PriceRecord } from './schemas/price-record.schema';
 
-const fetchLatestPriceByCode = async (code) => {
-  const priceResponse = await axios.get(
-    'https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest',
-    {
-      headers: {
-        'X-CMC_PRO_API_KEY': 'b54bcf4d-1bca-4e8e-9a24-22ff2c3d462c',
-      },
-      params: {
-        symbol: code,
-      },
-    }
-  );
+dotenv.config();
 
-  return priceResponse.data[code]?.quote.USD.price;
-};
+const MAX_ENTRIES_PER_PAGE = 5;
 
 @Injectable()
 export class AppService {
@@ -29,37 +18,30 @@ export class AppService {
 
   constructor(
     @InjectModel(Asset.name) private assetModel: Model<Asset>,
-    @Inject('Notifier') private client: ClientProxy
+    @InjectModel(PriceRecord.name) private priceRecordModel: Model<PriceRecord>,
+    @Inject(process.env.WS_ZIMZAM_NAME) private wsClient: ClientProxy,
+    @Inject(process.env.PRICE_FETCHER_NAME)
+    private priceFetcherClient: ClientProxy
   ) {
     this.intervalId = setInterval(async () => {
       const assets = await this.assetModel.find();
 
       Promise.all(
-        assets.map(async (asset) => {
-          const latestPrice = await this.fetchLatestPrice(asset);
-          console.log('fetched latest price', {
+        assets.map(async (asset) =>
+          this.priceFetcherClient.emit(MicroServiceEvent.FETCH_PRICE_REQUEST, {
+            assetId: asset.assetId,
             code: asset.code,
-            latestPrice,
-          });
-          this.sendLatestPriceUpdateMessage({
-            code: asset.code,
-            latestPrice,
-          });
-
-          console.log('sent latest price', { code: asset.code, latestPrice });
-        })
+          })
+        )
       );
     }, 1000 * 15);
   }
 
-  private sendLatestPriceUpdateMessage({ code, latestPrice }) {
-    this.client.emit(MicroServiceEvent.CMC_PRICE_UPDATE, { code, latestPrice });
-  }
-
-  async fetchLatestPrice({ assetId, code }) {
-    const latestPrice = await fetchLatestPriceByCode(code);
-
-    this.assetModel.updateOne({ assetId, latestPrice });
+  emitBroadcastLatestPrice({ code, latestPrice }) {
+    this.wsClient.emit(MicroServiceEvent.BROADCAST_LATEST_PRICE, {
+      code,
+      latestPrice,
+    });
   }
 
   async addCryptoCurrencyAsset(cryptoCurrencyCode: string) {
@@ -70,5 +52,54 @@ export class AppService {
     });
 
     return createdCryptoCurrencyAsset;
+  }
+
+  async recordPrice({ assetId, latestPrice }) {
+    await this.priceRecordModel.create({
+      assetId,
+      price: latestPrice,
+      time: Date.now(),
+    });
+  }
+
+  async getPriceHistory({ code, range, page }) {
+    const { assetId } = await this.assetModel.findOne({ code });
+
+    return this.priceRecordModel.find(
+      {
+        assetId,
+        time: { $gte: range.to, $lte: range.from },
+      },
+      null,
+      page || page === 0
+        ? {
+            limit: MAX_ENTRIES_PER_PAGE,
+            skip: page * MAX_ENTRIES_PER_PAGE,
+            sort: { time: 'desc' },
+          }
+        : {}
+    );
+  }
+
+  async getAssetsWithLatestPrices(codes): Promise<
+    {
+      code: string;
+      latestPrice?: number;
+    }[]
+  > {
+    const assets = await this.assetModel.find({ code: { $in: codes } });
+
+    return Promise.all(
+      assets.map(async (asset) => {
+        const [latestPriceRecord] = await this.priceRecordModel
+          .find({ assetId: asset.assetId })
+          .sort({ time: 'desc' });
+
+        return {
+          code: asset.code,
+          price: latestPriceRecord?.price,
+        };
+      })
+    );
   }
 }

@@ -1,0 +1,24 @@
+{
+  "name": "price-fetcher",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/price-fetcher/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "price-fetcher:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "price-fetcher:build:development"
+        },
+        "production": {
+          "buildTarget": "price-fetcher:build:production"
+        }
+      }
+    }
+  }
+}

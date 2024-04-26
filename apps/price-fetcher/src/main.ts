@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 async function bootstrap() {
   dotenv.config();
 
-  const port = Number(process.env.WS_ZIMZAM_MS_PORT)
+  const port = Number(process.env.PRICE_FETCHER_MS_PORT)
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -26,7 +26,7 @@ async function bootstrap() {
 
   await app.listen();
   Logger.log(
-    `🚀 ws-zimzam microservice is running on: http://localhost:${port}`
+    `🚀 price-fetcher microservice is running on: http://localhost:${port}`
   );
 }
 
