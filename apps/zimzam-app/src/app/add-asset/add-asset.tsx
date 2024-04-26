@@ -1,6 +1,8 @@
 import { Button } from '@mui/material';
 import { useState } from 'react';
 import { AddAssetModal } from './add-asset-modal';
+import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
 
 export const AddAsset = ({
   onAddAsset,
@@ -14,10 +16,15 @@ export const AddAsset = ({
   const handleClose = () => setOpen(false);
   const handleClosed = () => setAssetCodeInput('');
 
-  const handleSubmit = () => {
-    onAddAsset(assetCodeInput);
+  const handleSubmitSuccess = (assetCode: string) => {
+    onAddAsset(assetCode);
     handleClose();
   };
+
+  const { mutate: submitAsset } = useMutation({
+    mutationFn: () => axios.post('/api', { code: assetCodeInput }),
+    onSuccess: ({ data: { code } }) => handleSubmitSuccess(code),
+  });
 
   return (
     <>
@@ -28,7 +35,7 @@ export const AddAsset = ({
         open={open}
         onClose={handleClose}
         onClosed={handleClosed}
-        onSubmit={handleSubmit}
+        onSubmit={submitAsset}
         assetCodeInput={assetCodeInput}
         onAssetCodeInputChange={setAssetCodeInput}
       />

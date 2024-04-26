@@ -8,20 +8,18 @@ export default defineConfig({
   cacheDir: '../../node_modules/.vite/apps/zimzam-app',
 
   server: {
-    port: 3001,
+    port: 5000,
     host: 'localhost',
-  
+
     proxy: {
-      '/api': {
+      '/lol': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
-        ws: true,
+        ws: false,
       },
     },
   },
-
-  
 
   preview: {
     port: 4300,

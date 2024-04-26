@@ -9,13 +9,13 @@ import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { AppModule } from './app/app.module';
 import dotenv from 'dotenv';
 
-const MICRO_SERVICE_PORT = 4200
+const MICRO_SERVICE_PORT = 4200;
 
 async function bootstrap() {
   dotenv.config();
 
   const port = process.env.PORT || 3000;
-  const msPort = Number(process.env.ZIMZAM_MS_PORT)
+  const msPort = Number(process.env.ZIMZAM_MS_PORT);
 
   const app = await NestFactory.create(AppModule);
 
@@ -29,7 +29,9 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(port);
   Logger.log(`🚀 zimzam is running on: http://localhost:${port}`);
-  Logger.log(`🚀 zimzam microservice is running on: http://localhost:${msPort}`);
+  Logger.log(
+    `🚀 zimzam microservice is running on: http://localhost:${msPort}`
+  );
 }
 
 bootstrap();

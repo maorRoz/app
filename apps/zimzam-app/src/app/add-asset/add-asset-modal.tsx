@@ -20,12 +20,7 @@ export const AddAssetModal = ({
   assetCodeInput: string;
   onAssetCodeInputChange: (assetCodeInput: string) => void;
 }) => (
-  <Dialog
-    open={open}
-    onClose={onClose}
-    TransitionProps={{ onExited }}
-    onSubmit={onSubmit}
-  >
+  <Dialog open={open} onClose={onClose} TransitionProps={{ onExited }}>
     <DialogTitle>Add Asset</DialogTitle>
     <DialogContent>
       <TextField
