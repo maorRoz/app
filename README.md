@@ -16,7 +16,7 @@ this solution contains 3 microservices :
 
 1. run the following commands: 
 ```code
-   nx run-many --targets=build
+   npx nx run-many --targets=build
 
 ```
 
