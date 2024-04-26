@@ -45,7 +45,16 @@ export class AppService {
   }
 
   async addCryptoCurrencyAsset(cryptoCurrencyCode: string) {
+    const existingCryptoCurrencyAsset = await this.assetModel.findOne({
+      code: cryptoCurrencyCode,
+    });
+
+    if (existingCryptoCurrencyAsset) {
+      return existingCryptoCurrencyAsset;
+    }
+
     const assetId = uuidv4();
+
     const createdCryptoCurrencyAsset = await this.assetModel.create({
       assetId,
       code: cryptoCurrencyCode,
@@ -62,42 +71,37 @@ export class AppService {
     });
   }
 
-  async getPriceHistory({ code, range, page }) {
+  async getPriceHistory({ code, range }) {
     const { assetId } = await this.assetModel.findOne({ code });
 
-    return this.priceRecordModel.find(
-      {
+    return this.priceRecordModel
+      .find({
         assetId,
         time: { $gte: range.to, $lte: range.from },
-      },
-      null,
-      page || page === 0
-        ? {
-            limit: MAX_ENTRIES_PER_PAGE,
-            skip: page * MAX_ENTRIES_PER_PAGE,
-            sort: { time: 'desc' },
-          }
-        : {}
-    );
+      })
+      .sort({ time: 'desc' });
   }
 
   async getAssetsWithLatestPrices(codes): Promise<
     {
       code: string;
-      latestPrice?: number;
+      priceRecords: number[];
     }[]
   > {
     const assets = await this.assetModel.find({ code: { $in: codes } });
 
     return Promise.all(
       assets.map(async (asset) => {
-        const [latestPriceRecord] = await this.priceRecordModel
-          .find({ assetId: asset.assetId })
+        const latestPriceRecords = await this.priceRecordModel
+          .find({
+            assetId: asset.assetId,
+            time: { $gte: Date.now() - 1000 * 60, $lte: Date.now() },
+          })
           .sort({ time: 'desc' });
 
         return {
           code: asset.code,
-          price: latestPriceRecord?.price,
+          priceRecords: latestPriceRecords.map((record) => record.price),
         };
       })
     );

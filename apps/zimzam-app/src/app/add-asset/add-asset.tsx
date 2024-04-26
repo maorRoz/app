@@ -16,14 +16,18 @@ export const AddAsset = ({
   const handleClose = () => setOpen(false);
   const handleClosed = () => setAssetCodeInput('');
 
-  const handleSubmitSuccess = (assetCode: string) => {
-    onAddAsset(assetCode);
-    handleClose();
-  };
-
   const { mutate: submitAsset } = useMutation({
-    mutationFn: () => axios.post('/api', { code: assetCodeInput }),
-    onSuccess: ({ data: { code } }) => handleSubmitSuccess(code),
+    mutationFn: async () => {
+      const upperCaseAsset = assetCodeInput.toUpperCase();
+
+      const { data } = await axios.post('/api', { code: upperCaseAsset });
+
+      return data.code;
+    },
+    onSuccess: (assetCode) => {
+      onAddAsset(assetCode);
+      handleClose();
+    },
   });
 
   return (

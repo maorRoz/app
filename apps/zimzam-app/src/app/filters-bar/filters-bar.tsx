@@ -7,17 +7,24 @@ import TableRowsIcon from '@mui/icons-material/TableRowsOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { ViewMode } from '../../types/view-mode';
 import { useState } from 'react';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { SortMode } from '../../types/sort-mode';
 
 export const FiltersBar = ({
   searchInput,
   onSearchChange,
   viewMode,
   onViewModeChange,
+  sortMode,
+  onSortModeChange,
 }: {
   searchInput: string;
   onSearchChange: (searchInput: string) => void;
   viewMode: ViewMode;
   onViewModeChange: (viewMode: ViewMode) => void;
+  sortMode: SortMode;
+  onSortModeChange: (sortMode: SortMode) => void;
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   return (
@@ -48,6 +55,22 @@ export const FiltersBar = ({
         />
       </div>
       <div>
+        <Select
+          value={sortMode}
+          onChange={(event: SelectChangeEvent) => {
+            onSortModeChange(event.target.value as SortMode);
+          }}
+          sx={{ color: '#5D3FD3' }}
+          variant="standard"
+          disableUnderline
+        >
+          <MenuItem value={SortMode.FAVORITE_FIRST}>
+            Show Favorite first
+          </MenuItem>
+          <MenuItem value={SortMode.NAME_ASCENDING}>Sort by Name A-Z</MenuItem>
+          <MenuItem value={SortMode.NAME_DESCENDING}>Sort by Name Z-A</MenuItem>
+        </Select>
+
         <IconButton
           size="small"
           color={viewMode === ViewMode.ROWS ? 'primary' : 'default'}

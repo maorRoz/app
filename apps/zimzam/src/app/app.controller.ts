@@ -17,15 +17,13 @@ export class AppController {
     @Param('code') code: string,
     @Query()
     {
-      from = '0',
+      from = (Date.now() - 1000 * 60).toString(),
       to = Date.now().toString(),
-      page,
-    }: { from?: string; to?: string; page?: string }
+    }: { from?: string; to?: string }
   ) {
     return this.appService.getPriceHistory({
       code,
       range: { from: Number(from), to: Number(to) },
-      page: Number(page) ?? undefined,
     });
   }
 
@@ -35,10 +33,10 @@ export class AppController {
   ): Promise<
     {
       code: string;
-      latestPrice?: number;
+      priceRecords: number[];
     }[]
   > {
-    const codes = Array.isArray(code) ? [code].filter(Boolean) : code;
+    const codes = Array.isArray(code) ? code : [code].filter(Boolean);
     return this.appService.getAssetsWithLatestPrices(codes);
   }
 

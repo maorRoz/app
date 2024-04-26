@@ -17,15 +17,9 @@ export class AppGateway {
       code,
       latestPrice,
     });
-    console.log(`broadcast ${WebsocketBroadcastEvent.ON_PRICE_UPDATE} `, {
-      code,
-      latestPrice,
-    });
   }
 
   broadcastLatestPriceUpdateByCode({ code, latestPrice }) {
     this.server.sockets.emit(code, latestPrice);
-
-    console.log(`broadcast ${code} `, latestPrice);
   }
 }
