@@ -10,13 +10,12 @@ export default defineConfig({
   server: {
     port: 5000,
     host: 'localhost',
-
     proxy: {
-      '/lol': {
+      '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
-        ws: false,
+        ws: true,
       },
     },
   },

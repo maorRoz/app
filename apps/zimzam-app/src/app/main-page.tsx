@@ -12,7 +12,7 @@ export const MainPage = () => {
   const { data } = useQuery({
     queryKey: ['getAssets', selectedAssets],
     queryFn: async () => {
-      const { data } = await axios.get('/lol/latest-price', {
+      const { data } = await axios.get('/api/latest-price', {
         params: { code: 'BTC' },
       });
 

@@ -27,6 +27,10 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
+
+  const globalPrefix = 'api';
+  app.setGlobalPrefix(globalPrefix);
+
   await app.listen(port);
   Logger.log(`🚀 zimzam is running on: http://localhost:${port}`);
   Logger.log(
