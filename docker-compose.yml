@@ -4,8 +4,13 @@ services:
   #  container_name: zimzam
   #  image: node:latest
   #  restart: always
+  #  build:
+  #    dockerfile: ./Dockerfile.zimzam
+  #  depends_on:
+  #    - mongodb
   #  ports: 
   #    - "4200:4200"
+  #    - "3000:3000"
 
   #ws-zimzam:
   #  container_name: zimzam
@@ -13,6 +18,14 @@ services:
   #  restart: always
   #  ports: 
   #    - "4201:4201"
+  #    - "80:80"
+
+  #price-fetcher:
+  #  container_name: price-fetcher
+  #  image: node:latest
+  #  restart: always
+  #  ports: 
+  #    - "4202:4202"
 
 
   mongodb:

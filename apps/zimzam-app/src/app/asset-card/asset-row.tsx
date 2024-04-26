@@ -36,7 +36,7 @@ export const AssetRow = ({
     <div className="flex items-center gap-2 w-[100px]">
       <div className="w-8 h-8">
         <img
-          src={`/src/assets/svgs/${assetCode.toLowerCase()}.svg`}
+          src={`/svgs/${assetCode.toLowerCase()}.svg`}
           alt={assetCode}
         />
       </div>
